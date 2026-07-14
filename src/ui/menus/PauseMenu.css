@@ -1,0 +1,111 @@
+.pause-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pause-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+.pause-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.pause-title {
+  font-size: 36px;
+  font-weight: 900;
+  color: #fff;
+  margin: 0;
+}
+
+.pause-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pause-btn {
+  width: 200px;
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 700;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+}
+
+.pause-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+.pause-btn.primary {
+  background: linear-gradient(135deg, #4fc3f7, #2196f3);
+  border-color: transparent;
+}
+
+.pause-btn.primary:hover {
+  box-shadow: 0 4px 20px rgba(33, 150, 243, 0.4);
+}
+
+.pause-keys {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  background: rgba(20, 20, 30, 0.6);
+  padding: 16px 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pause-key-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #c8c8c8;
+}
+
+.pause-key-row kbd {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 11px;
+  color: #ffd54f;
+  font-family: monospace;
+  min-width: 50px;
+  text-align: center;
+}
+
+
+/* ─── 移动端适配 ─── */
+@media (max-width: 768px) {
+  .pause-title { font-size: 28px; }
+  .pause-content { gap: 14px; padding: 0 16px; }
+  .pause-keys {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 10px 14px;
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+  .pause-key-row { font-size: 11px; gap: 8px; }
+  .pause-key-row kbd { font-size: 10px; padding: 2px 8px; min-width: 40px; }
+  .pause-btn { width: 180px; padding: 10px 0; font-size: 14px; min-height: 44px; }
+}

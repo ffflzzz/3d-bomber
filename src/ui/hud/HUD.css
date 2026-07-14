@@ -1,0 +1,1332 @@
+/* ═══════════════════════════════════════════════════════════
+   DOTA 2 FAITHFUL HUD REPRODUCTION
+   Exact layout, colors, and proportions from Dota 2
+   ═══════════════════════════════════════════════════════════ */
+
+.dota-hud {
+  position: fixed;
+  top: var(--safe-top, 0px);
+  bottom: var(--safe-bottom, 0px);
+  left: var(--safe-left, 0px);
+  right: var(--safe-right, 0px);
+  pointer-events: none;
+  font-family: 'Trajan Pro 3', 'Noto Sans SC', 'Microsoft YaHei', serif;
+  z-index: 10;
+  color: #c8c8c8;
+}
+
+/* ─── COLOR PALETTE (from Dota 2) ─── */
+:root {
+  --dota-gold: #c8a84e;
+  --dota-gold-bright: #e8d48a;
+  --dota-gold-dark: #8b6914;
+  --dota-hp-green: #4caf50;
+  --dota-hp-red: #b71c1c;
+  --dota-mp-blue: #1565c0;
+  --dota-xp-purple: #7b1fa2;
+  --dota-bg-dark: rgba(0, 0, 0, 0.85);
+  --dota-bg-panel: rgba(10, 8, 15, 0.92);
+  --dota-border: rgba(200, 168, 78, 0.3);
+  --dota-border-bright: rgba(200, 168, 78, 0.6);
+  --dota-radiant: #92a525;
+  --dota-dire: #c23c2a;
+  --dota-text: #c8c8c8;
+  --dota-text-dim: rgba(200, 200, 200, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOP BAR
+   ═══════════════════════════════════════════════════════════ */
+.dota-topbar {
+  position: absolute;
+  pointer-events: auto;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  pointer-events: auto;
+}
+
+.topbar-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 24px;
+  min-width: 120px;
+}
+
+.topbar-radiant {
+  background: linear-gradient(180deg, rgba(146, 165, 37, 0.3) 0%, transparent 100%);
+  border-bottom: 2px solid var(--dota-radiant);
+}
+
+.topbar-dire {
+  background: linear-gradient(180deg, rgba(194, 60, 42, 0.3) 0%, transparent 100%);
+  border-bottom: 2px solid var(--dota-dire);
+}
+
+.team-score {
+  font-size: 28px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+  line-height: 1;
+}
+
+.topbar-radiant .team-score { color: var(--dota-radiant); }
+.topbar-dire .team-score { color: var(--dota-dire); }
+
+.team-name {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--dota-text-dim);
+  text-transform: uppercase;
+}
+
+.topbar-center-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--dota-bg-panel);
+  padding: 4px 20px 6px;
+  border-bottom: 2px solid var(--dota-gold);
+  min-width: 100px;
+}
+
+.topbar-timer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.daynight-indicator {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.daynight-indicator.day { filter: brightness(1.2); }
+.daynight-indicator.night { filter: brightness(0.7) hue-rotate(200deg); }
+
+.daynight-icon { font-size: 14px; }
+
+.timer-text {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+}
+
+.topbar-kills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.kill-num { font-weight: 700; }
+.kill-radiant { color: var(--dota-radiant); }
+.kill-separator { color: var(--dota-text-dim); font-size: 10px; }
+.kill-dire { color: var(--dota-dire); }
+
+/* ═══════════════════════════════════════════════════════════
+   KILL FEED (top-right)
+   ═══════════════════════════════════════════════════════════ */
+.dota-killfeed {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 280px;
+}
+
+.killfeed-entry {
+  padding: 4px 10px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 2px;
+  font-size: 11px;
+  color: var(--dota-text);
+  border-left: 3px solid var(--dota-gold);
+  animation: killfeed-in 0.3s ease-out;
+}
+
+.killfeed-xp { border-left-color: var(--dota-xp-purple); }
+.killfeed-levelup { border-left-color: var(--dota-gold-bright); color: var(--dota-gold-bright); }
+.killfeed-quest { border-left-color: var(--dota-radiant); }
+
+@keyframes killfeed-in {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HERO PORTRAIT AREA (left side, above minimap)
+   ═══════════════════════════════════════════════════════════ */
+.dota-hero-area {
+  position: absolute;
+  bottom: 252px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: auto;
+}
+
+.hero-portrait-container {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.hero-portrait {
+  position: relative;
+  width: 72px;
+  height: 84px;
+  border: 2px solid var(--dota-gold);
+  border-radius: 4px;
+  background: var(--dota-bg-panel);
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+}
+
+.hero-portrait-img {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  background: linear-gradient(180deg, rgba(30,30,50,0.8) 0%, rgba(15,15,25,0.9) 100%);
+}
+
+.hero-level-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(90deg, var(--dota-gold-dark), var(--dota-gold));
+  text-align: center;
+  font-size: 16px;
+  font-weight: 900;
+  color: #000;
+  padding: 1px 0;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.hero-buffs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  max-width: 80px;
+}
+
+.buff-icon {
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 2px;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.buff-active {
+  border-color: rgba(100, 200, 100, 0.4);
+  background: rgba(0, 100, 0, 0.2);
+}
+
+.buff-empty {
+  opacity: 0.3;
+}
+
+/* ─── HP / MP / XP Bars ─── */
+.hero-bars-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 180px;
+}
+
+.hero-bar-group {
+  position: relative;
+}
+
+.bar-outer {
+  position: relative;
+  width: 100%;
+  height: 18px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.bar-inner {
+  height: 100%;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.hp-inner {
+  background: linear-gradient(180deg, #6abf69 0%, #4caf50 40%, #2e7d32 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+.mp-inner {
+  background: linear-gradient(180deg, #42a5f5 0%, #1e88e5 40%, #1565c0 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+.xp-inner {
+  background: linear-gradient(180deg, #ab47bc 0%, #7b1fa2 100%);
+}
+
+.xp-outer {
+  height: 8px;
+}
+
+.bar-value {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.5);
+  font-variant-numeric: tabular-nums;
+}
+
+.xp-value {
+  font-size: 8px;
+}
+
+.bar-label-text {
+  position: absolute;
+  right: 4px;
+  top: 1px;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.25);
+  text-transform: uppercase;
+}
+
+/* ─── Stats Panel ─── */
+.hero-stats-panel {
+  display: flex;
+  gap: 8px;
+  padding: 3px 6px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 2px;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.stat-icon-str, .stat-icon-agi, .stat-icon-int {
+  font-size: 12px;
+  width: 16px;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MINIMAP (exact Dota 2 bottom-left)
+   ═══════════════════════════════════════════════════════════ */
+.minimap-container {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.minimap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 8px;
+  background: var(--dota-bg-panel);
+  border: 1px solid var(--dota-border);
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+}
+
+.minimap-label {
+  font-size: 9px;
+  font-weight: 900;
+  color: var(--dota-gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.minimap-coords {
+  font-size: 9px;
+  color: var(--dota-text-dim);
+  font-family: 'Consolas', monospace;
+}
+
+.minimap-canvas {
+  display: block;
+  border: 2px solid var(--dota-gold-dark);
+  border-top: 1px solid var(--dota-border);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+.minimap-legend {
+  display: flex;
+  gap: 8px;
+  padding: 2px 6px;
+  background: var(--dota-bg-panel);
+  border: 1px solid var(--dota-border);
+  border-top: none;
+  border-radius: 0 0 3px 3px;
+}
+
+.minimap-legend span {
+  font-size: 8px;
+  color: var(--dota-text-dim);
+}
+
+.legend-player { color: #4fc3f7; }
+.legend-enemy { color: var(--dota-radiant); }
+.legend-boss { color: var(--dota-dire); }
+
+/* ─── Minimap Action Buttons (Scan, Courier, Hero) ─── */
+.dota-minimap-buttons {
+  pointer-events: auto;
+  position: absolute;
+  bottom: 8px;
+  left: 224px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  pointer-events: auto;
+}
+
+.minimap-action-btn {
+  width: 32px;
+  height: 32px;
+  background: var(--dota-bg-panel);
+  border: 1px solid var(--dota-border);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--dota-text);
+  transition: all 0.15s;
+}
+
+.minimap-action-btn:hover {
+  border-color: var(--dota-gold);
+  background: rgba(200, 168, 78, 0.1);
+}
+
+/* ─── Shop Button ─── */
+.dota-shop-btn {
+  pointer-events: auto;
+  position: absolute;
+  bottom: 8px;
+  left: 260px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: var(--dota-bg-panel);
+  border: 1px solid var(--dota-border);
+  border-radius: 3px;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.dota-shop-btn:hover {
+  border-color: var(--dota-gold);
+}
+
+.shop-icon { font-size: 16px; }
+.shop-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--dota-gold);
+  letter-spacing: 1px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ABILITY BAR (exact Dota 2 bottom-center)
+   ═══════════════════════════════════════════════════════════ */
+.dota-ability-area {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.autoattack-toggle {
+  margin-bottom: 8px;
+}
+
+.aa-icon {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--dota-border);
+  border-radius: 3px;
+  background: var(--dota-bg-panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.aa-icon.active {
+  border-color: var(--dota-gold);
+  box-shadow: 0 0 6px rgba(200, 168, 78, 0.3);
+}
+
+.ability-slots {
+  display: flex;
+  gap: 3px;
+}
+
+.ability-slot {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  border: 2px solid rgba(100, 100, 100, 0.4);
+  border-radius: 4px;
+  background: var(--dota-bg-panel);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  overflow: hidden;
+}
+
+.ability-slot.learned {
+  border-color: var(--dota-gold-dark);
+}
+
+.ability-slot.learned:hover {
+  border-color: var(--dota-gold);
+  box-shadow: 0 0 10px rgba(200, 168, 78, 0.4);
+}
+
+.ability-slot.unlearned {
+  opacity: 0.35;
+  filter: grayscale(0.8);
+}
+
+.ability-slot.ultimate {
+  width: 66px;
+  height: 66px;
+  border-color: var(--dota-gold);
+  border-width: 3px;
+}
+
+.ability-slot.ultimate .ability-icon-text {
+  font-size: 28px;
+}
+
+.ability-icon-bg {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(40,40,60,0.6) 0%, rgba(15,15,25,0.8) 100%);
+}
+
+.ability-icon-text {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.ability-cooldown {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.cd-text {
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 6px rgba(0,0,0,0.8);
+}
+
+.ability-level-pips {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2px;
+  z-index: 1;
+}
+
+.level-pip {
+  width: 6px;
+  height: 4px;
+  border-radius: 1px;
+}
+
+.level-pip.filled {
+  background: var(--dota-gold);
+  box-shadow: 0 0 3px rgba(200, 168, 78, 0.5);
+}
+
+.level-pip.empty {
+  background: rgba(100, 100, 100, 0.3);
+}
+
+.ability-hotkey {
+  position: absolute;
+  bottom: 1px;
+  left: 3px;
+  font-size: 9px;
+  font-weight: 900;
+  color: var(--dota-gold);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  z-index: 1;
+}
+
+.ability-manacost {
+  position: absolute;
+  top: 1px;
+  right: 3px;
+  font-size: 9px;
+  font-weight: 700;
+  color: #42a5f5;
+  z-index: 1;
+}
+
+.levelup-btn {
+  width: 28px;
+  height: 28px;
+  background: var(--dota-gold);
+  border: 2px solid var(--dota-gold-bright);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 18px;
+  color: #000;
+  font-weight: 900;
+  transition: all 0.15s;
+  box-shadow: 0 0 8px rgba(200, 168, 78, 0.4);
+}
+
+.levelup-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 14px rgba(200, 168, 78, 0.7);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INVENTORY (bottom-right of center, Dota 2 exact)
+   ═══════════════════════════════════════════════════════════ */
+.dota-inventory-area {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: auto;
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 44px);
+  grid-template-rows: repeat(2, 44px);
+  gap: 2px;
+}
+
+.inv-slot {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  background: var(--dota-bg-panel);
+  border: 1px solid rgba(100, 100, 100, 0.3);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inv-slot.has-item {
+  border-color: var(--dota-border);
+}
+
+.inv-icon {
+  font-size: 18px;
+}
+
+.inv-hotkey {
+  position: absolute;
+  bottom: 1px;
+  right: 3px;
+  font-size: 8px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.35);
+}
+
+/* Backpack */
+.backpack-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bp-label {
+  font-size: 7px;
+  font-weight: 700;
+  color: var(--dota-text-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.bp-slots {
+  display: flex;
+  gap: 2px;
+}
+
+.bp-slot {
+  width: 32px;
+  height: 32px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(80, 80, 80, 0.3);
+  border-radius: 2px;
+  opacity: 0.5;
+}
+
+/* Neutral + TP */
+.neutral-slot, .tp-slot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(80, 80, 80, 0.3);
+  border-radius: 2px;
+}
+
+.neutral-icon, .tp-icon {
+  font-size: 14px;
+}
+
+.neutral-label, .tp-label {
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--dota-text-dim);
+  letter-spacing: 1px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GOLD DISPLAY (bottom-right)
+   ═══════════════════════════════════════════════════════════ */
+.dota-gold {
+  position: absolute;
+  bottom: 116px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--dota-border);
+  border-radius: 3px;
+}
+
+.gold-icon { font-size: 16px; }
+.gold-amount {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--dota-gold-bright);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   QUICKBUY (bottom-center, left of abilities)
+   ═══════════════════════════════════════════════════════════ */
+.dota-quickbuy {
+  position: absolute;
+  bottom: 76px;
+  left: 50%;
+  transform: translateX(-50%) translateX(-220px);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: auto;
+}
+
+.qb-label {
+  font-size: 7px;
+  font-weight: 700;
+  color: var(--dota-text-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.qb-items {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--dota-border);
+  border-radius: 2px;
+}
+
+.qb-item { font-size: 16px; }
+.qb-cost { font-size: 11px; color: var(--dota-gold); font-weight: 700; }
+
+/* ═══════════════════════════════════════════════════════════
+   TOGGLE BUTTONS
+   ═══════════════════════════════════════════════════════════ */
+.dota-toggles {
+  pointer-events: auto;
+  position: absolute;
+  bottom: 260px;
+  left: 224px;
+  display: flex;
+  gap: 4px;
+  pointer-events: auto;
+}
+
+.dota-toggle {
+  width: 28px;
+  height: 28px;
+  background: var(--dota-bg-panel);
+  border: 1px solid var(--dota-border);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.dota-toggle:hover {
+  border-color: var(--dota-gold);
+}
+
+.dota-toggle.active {
+  border-color: var(--dota-gold);
+  background: rgba(200, 168, 78, 0.15);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ABILITY BAR (bottom center)
+   ═══════════════════════════════════════════════════════════ */
+.ability-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  pointer-events: auto;
+  z-index: 20;
+}
+
+.ability-slot {
+  width: 56px;
+  height: 66px;
+  background: rgba(20, 20, 30, 0.9);
+  border: 2px solid rgba(200, 168, 78, 0.5);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.ability-slot:hover {
+  border-color: #e8d48a;
+}
+
+.ability-slot.ability-cooldown {
+  opacity: 0.6;
+}
+
+.ability-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.ability-key {
+  font-size: 9px;
+  color: var(--dota-gold, #c8a84e);
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.ability-name {
+  font-size: 8px;
+  color: rgba(200, 200, 200, 0.6);
+  text-align: center;
+  line-height: 1;
+}
+
+.ability-mana {
+  font-size: 8px;
+  color: #42a5f5;
+  font-weight: 600;
+}
+
+.ability-cd-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 0 0 6px 6px;
+  pointer-events: none;
+  transition: height 0.1s linear;
+}
+
+.ability-cd-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   WAVE ANNOUNCEMENT (center screen)
+   ═══════════════════════════════════════════════════════════ */
+.wave-announcement {
+  position: fixed;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 30;
+  pointer-events: none;
+  animation: waveFadeIn 0.5s ease-out;
+}
+
+.wave-text {
+  font-size: 48px;
+  font-weight: 900;
+  color: #ffd54f;
+  text-shadow: 0 4px 20px rgba(255, 213, 79, 0.6), 0 0 40px rgba(255, 152, 0, 0.3);
+  letter-spacing: 4px;
+}
+
+.wave-sub {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 8px;
+}
+
+@keyframes waveFadeIn {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.5); }
+  100% { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COMBO DISPLAY (right center)
+   ═══════════════════════════════════════════════════════════ */
+.combo-display {
+  position: fixed;
+  top: 40%;
+  right: 40px;
+  text-align: right;
+  z-index: 25;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.combo-number {
+  font-size: 64px;
+  font-weight: 900;
+  color: #ff9800;
+  text-shadow: 0 4px 15px rgba(255, 152, 0, 0.6);
+  display: block;
+  line-height: 1;
+  animation: comboPopIn 0.2s ease-out;
+}
+
+.combo-label {
+  font-size: 20px;
+  color: rgba(255, 213, 79, 0.8);
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+@keyframes comboPopIn {
+  0% { transform: scale(1.5); }
+  100% { transform: scale(1); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   WAVE PROGRESS (in topbar)
+   ═══════════════════════════════════════════════════════════ */
+.topbar-wave {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.wave-num {
+  font-size: 13px;
+  color: #ffd54f;
+  font-weight: 700;
+}
+
+.wave-progress {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   STATS MINI (top left corner)
+   ═══════════════════════════════════════════════════════════ */
+.stats-mini {
+  position: fixed;
+  top: 60px;
+  left: 12px;
+  display: flex;
+  gap: 10px;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.stat-mini-item {
+  font-size: 12px;
+  color: rgba(200, 200, 200, 0.7);
+  background: rgba(20, 20, 30, 0.6);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MP BAR (blue, alongside HP)
+   ═══════════════════════════════════════════════════════════ */
+.mp-outer {
+  background: rgba(30, 60, 100, 0.7);
+  border: 1px solid rgba(66, 165, 245, 0.3);
+}
+
+.mp-inner {
+  background: linear-gradient(90deg, #1976d2, #42a5f5);
+  height: 100%;
+  transition: width 0.15s ease;
+}
+
+/* Override killfeed types for new notification types */
+.killfeed-combo {
+  color: #ff9800;
+}
+
+.killfeed-wave {
+  color: #ffd54f;
+  font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DIMENSION TRANSITION OVERLAY
+   ═══════════════════════════════════════════════════════════ */
+.dimension-transition-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.95) 0%, rgba(10,0,30,0.98) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  pointer-events: none;
+  animation: portalTransition 0.8s ease-in-out;
+}
+
+.transition-text {
+  font-size: 36px;
+  font-weight: 900;
+  color: #7c4dff;
+  text-shadow: 0 0 30px rgba(124, 77, 255, 0.8), 0 0 60px rgba(124, 77, 255, 0.4);
+  letter-spacing: 8px;
+  animation: portalPulse 1s ease-in-out infinite;
+}
+
+@keyframes portalTransition {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
+@keyframes portalPulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DIMENSION NAME IN TOPBAR
+   ═══════════════════════════════════════════════════════════ */
+.topbar-dimension {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  margin-bottom: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PORTAL LEGEND IN MINIMAP
+   ═══════════════════════════════════════════════════════════ */
+.legend-portal {
+  color: #7c4dff;
+  font-size: 10px;
+}
+
+.minimap-legend {
+  display: flex;
+  gap: 6px;
+  padding: 2px 4px;
+  font-size: 9px;
+}
+
+.legend-player { color: #4fc3f7; }
+.legend-enemy { color: #92a525; }
+.legend-boss { color: #c23c2a; }
+
+/* ═══════════════════════════════════════════════════════════
+   GAME OVER SCREEN
+   ═══════════════════════════════════════════════════════════ */
+.gameover-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.gameover-title {
+  font-size: 64px;
+  font-weight: 900;
+  color: #ef5350;
+  text-shadow: 0 4px 20px rgba(239, 83, 80, 0.6);
+  margin-bottom: 20px;
+}
+
+.gameover-stats {
+  font-size: 18px;
+  color: #c8c8c8;
+  text-align: center;
+  line-height: 1.8;
+}
+
+.gameover-restart {
+  margin-top: 30px;
+  padding: 12px 40px;
+  font-size: 20px;
+  background: linear-gradient(180deg, #c8a84e, #8b6914);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE - 平板/手机横屏适配
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── 平板 (≤1024px) ─── */
+@media (max-width: 1024px) {
+  .dota-topbar {
+    transform: translateX(-50%) scale(0.85);
+    transform-origin: top center;
+  }
+  .dota-killfeed {
+    max-width: 200px;
+    font-size: 10px;
+  }
+  .dota-hero-area {
+    bottom: 8px;
+    left: 8px;
+    transform: scale(0.8);
+    transform-origin: bottom left;
+  }
+  .dota-inventory-area {
+    transform: scale(0.75);
+    transform-origin: bottom right;
+  }
+  .dota-minimap-buttons {
+  pointer-events: auto;
+    transform: scale(0.8);
+  }
+  .dota-quickbuy {
+    display: none;
+  }
+  .dota-gold {
+    transform: scale(0.85);
+  }
+}
+
+/* ─── 手机横屏 (≤768px) ─── */
+@media (max-width: 768px) {
+  /* 顶栏精简 */
+  .dota-topbar {
+    transform: translateX(-50%) scale(0.65);
+    transform-origin: top center;
+  }
+  .team-name { display: none; }
+
+  /* 击杀信息精简 */
+  .dota-killfeed {
+    max-width: 160px;
+    top: 4px;
+    right: 4px;
+  }
+  .killfeed-entry {
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+
+  /* 英雄区域隐藏复杂元素 */
+  .dota-hero-area {
+    transform: scale(0.6);
+    transform-origin: bottom left;
+    bottom: 4px;
+    left: 4px;
+  }
+  .hero-buffs, .hero-stats-grid {
+    display: none;
+  }
+
+  /* 背包/中立道具/TP隐藏 */
+  .backpack-grid, .neutral-slot, .tp-slot {
+    display: none;
+  }
+  .dota-inventory-area {
+    transform: scale(0.55);
+    transform-origin: bottom right;
+    bottom: 4px;
+    right: 4px;
+  }
+  .inventory-grid {
+    gap: 2px;
+  }
+  .inv-slot {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* 商店按钮隐藏 */
+  .dota-shop-btn {
+  pointer-events: auto;
+    display: none;
+  }
+
+  /* 小地图缩小 */
+  .dota-minimap {
+    width: 120px;
+    height: 120px;
+    bottom: 8px;
+    left: 8px;
+  }
+  .dota-minimap-buttons {
+  pointer-events: auto;
+    display: none;
+  }
+
+  /* 快速购买隐藏 */
+  .dota-quickbuy { display: none; }
+
+  /* 金币精简 */
+  .dota-gold {
+    bottom: 4px;
+    right: 4px;
+    font-size: 12px;
+  }
+
+  /* 切换按钮精简 */
+  .dota-toggles {
+  pointer-events: auto;
+    gap: 2px;
+    right: 4px;
+  }
+  .dota-toggle {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  /* 技能栏缩小 */
+  .dota-ability-bar {
+    transform: scale(0.7);
+    transform-origin: bottom center;
+  }
+}
+
+/* ─── 竖屏模式 — 强制提示旋转 ─── */
+@media (orientation: portrait) and (max-width: 1024px) {
+  .dota-hud::before {
+    content: '请旋转设备至横屏模式';
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.9);
+    color: #c8a84e;
+    font-size: 20px;
+    z-index: 9999;
+    letter-spacing: 4px;
+    pointer-events: auto;
+  }
+}

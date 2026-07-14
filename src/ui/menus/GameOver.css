@@ -1,0 +1,140 @@
+.gameover {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gameover-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 0, 0, 0.85);
+}
+
+.gameover-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-width: 500px;
+}
+
+.gameover-title {
+  font-size: 48px;
+  font-weight: 900;
+  color: #ef5350;
+  text-shadow: 0 4px 20px rgba(239, 83, 80, 0.5);
+  margin: 0;
+}
+
+.gameover-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.gameover-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 12px 8px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 900;
+  color: #ffd54f;
+}
+
+.gameover-detail-stats {
+  width: 100%;
+  background: rgba(20, 20, 30, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.detail-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #e8d48a;
+}
+
+.gameover-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.gameover-btn {
+  width: 160px;
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 700;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+}
+
+.gameover-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+.gameover-btn.primary {
+  background: linear-gradient(135deg, #ff9800, #ff5722);
+  border-color: transparent;
+}
+
+.gameover-btn.primary:hover {
+  box-shadow: 0 4px 20px rgba(255, 152, 0, 0.4);
+}
+
+
+/* ─── 移动端适配 ─── */
+@media (max-width: 768px) {
+  .gameover-content { gap: 14px; padding: 0 16px; max-width: 100%; }
+  .gameover-title { font-size: 32px; }
+  .gameover-stats-grid { gap: 8px; }
+  .gameover-stat { padding: 8px 4px; }
+  .stat-label { font-size: 10px; }
+  .stat-value { font-size: 22px; }
+  .gameover-detail-stats { padding: 10px; }
+  .detail-label { font-size: 12px; }
+  .detail-value { font-size: 14px; }
+  .gameover-btn { width: 140px; padding: 10px 0; font-size: 14px; min-height: 44px; }
+}

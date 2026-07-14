@@ -1,0 +1,165 @@
+.main-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-backdrop {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(26, 26, 46, 0.85) 0%, rgba(10, 10, 20, 0.95) 100%);
+}
+
+.menu-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.menu-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 56px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 4px 20px rgba(255, 152, 0, 0.5);
+  margin: 0;
+}
+
+.title-bomb {
+  font-size: 64px;
+  animation: bomb-bounce 1.5s ease-in-out infinite;
+}
+
+.title-text {
+  background: linear-gradient(135deg, #ff9800, #ff5722);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.menu-subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 4px;
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.menu-btn {
+  width: 240px;
+  padding: 14px 0;
+  font-size: 18px;
+  font-weight: 700;
+  border: 2px solid rgba(255, 152, 0, 0.4);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+}
+
+.menu-btn:hover {
+  background: rgba(255, 152, 0, 0.15);
+  border-color: #ff9800;
+  transform: scale(1.05);
+}
+
+.menu-btn-primary {
+  background: linear-gradient(135deg, #ff9800, #ff5722);
+  border-color: transparent;
+}
+
+.menu-btn-primary:hover {
+  background: linear-gradient(135deg, #ffa726, #ff6e40);
+  box-shadow: 0 4px 20px rgba(255, 152, 0, 0.4);
+}
+
+.menu-footer {
+  display: flex;
+  gap: 24px;
+  margin-top: 40px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+@keyframes bomb-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.menu-features {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.menu-feature {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 6px 14px;
+}
+
+.menu-feat-icon {
+  font-size: 18px;
+}
+
+.menu-feat-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+
+/* ─── 移动端适配 ─── */
+@media (max-width: 1024px) {
+  .menu-title { font-size: 40px; }
+  .title-bomb { font-size: 48px; }
+  .menu-subtitle { font-size: 13px; letter-spacing: 2px; }
+  .menu-btn { width: 200px; padding: 12px 0; font-size: 16px; }
+  .menu-features { gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .menu-feature { padding: 5px 10px; }
+  .menu-feat-text { font-size: 11px; }
+}
+
+@media (max-width: 768px) {
+  .menu-content { gap: 16px; padding: 0 16px; }
+  .menu-title { font-size: 28px; }
+  .title-bomb { font-size: 36px; }
+  .menu-subtitle { font-size: 11px; letter-spacing: 1px; }
+  .menu-buttons { gap: 10px; margin-top: 16px; }
+  .menu-btn { width: 180px; padding: 10px 0; font-size: 14px; min-height: 44px; }
+  .menu-features { gap: 8px; }
+  .menu-feature { padding: 4px 8px; }
+  .menu-feat-icon { font-size: 14px; }
+  .menu-feat-text { font-size: 10px; }
+  .menu-footer { margin-top: 20px; font-size: 10px; gap: 16px; }
+}
+
+@media (orientation: portrait) and (max-width: 1024px) {
+  .main-menu::after {
+    content: '🎮 请旋转设备至横屏体验更佳';
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+}

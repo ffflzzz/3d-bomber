@@ -1,0 +1,136 @@
+.settings-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 20, 0.8);
+}
+
+.settings-content {
+  position: relative;
+  background: linear-gradient(135deg, rgba(30, 30, 50, 0.95), rgba(20, 20, 35, 0.98));
+  border: 1px solid rgba(200, 168, 78, 0.3);
+  border-radius: 16px;
+  padding: 32px 40px;
+  min-width: 420px;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.settings-title {
+  font-size: 28px;
+  font-weight: 900;
+  color: #e8d48a;
+  margin: 0 0 24px 0;
+  text-align: center;
+}
+
+.settings-section {
+  margin-bottom: 24px;
+}
+
+.settings-label {
+  font-size: 16px;
+  color: #c8a84e;
+  margin: 0 0 12px 0;
+  border-bottom: 1px solid rgba(200, 168, 78, 0.2);
+  padding-bottom: 6px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.settings-row-label {
+  font-size: 14px;
+  color: #c8c8c8;
+  min-width: 80px;
+}
+
+.settings-slider {
+  flex: 1;
+  accent-color: #ff9800;
+  height: 4px;
+}
+
+.settings-value {
+  font-size: 13px;
+  color: rgba(200, 200, 200, 0.6);
+  min-width: 40px;
+  text-align: right;
+}
+
+.settings-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #c8c8c8;
+}
+
+.control-row kbd {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  color: #ffd54f;
+  font-family: monospace;
+  min-width: 40px;
+  text-align: center;
+}
+
+.settings-close-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ff9800, #ff5722);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  margin-top: 16px;
+}
+
+.settings-close-btn:hover {
+  opacity: 0.85;
+}
+
+
+/* ─── 移动端适配 ─── */
+@media (max-width: 768px) {
+  .settings-content {
+    min-width: unset;
+    width: calc(100% - 32px);
+    max-width: 400px;
+    padding: 20px 24px;
+    max-height: 85vh;
+  }
+  .settings-title { font-size: 22px; margin-bottom: 16px; }
+  .settings-label { font-size: 14px; }
+  .settings-controls { grid-template-columns: 1fr; gap: 6px; }
+  .control-row { font-size: 11px; }
+  .control-row kbd { font-size: 9px; min-width: 32px; padding: 2px 6px; }
+  .settings-close-btn { padding: 14px; font-size: 15px; min-height: 48px; }
+}
