@@ -537,7 +537,6 @@ function Bomb({ bomb, onExplode }: { bomb: BombInstance; onExplode: (b: BombInst
     if (meshRef.current) {
       const scale = bScale + Math.sin(Date.now() * 0.01) * 0.1 * Math.max(0, bomb.timer)
       meshRef.current.scale.setScalar(scale)
-      meshRef.current.visible = true
     }
   })
   return (
@@ -622,6 +621,8 @@ function Explosion({ x, z, radius, onDone, explosionId }: {
 function MonsterRenderer({ monsters, dimensionId }: { monsters: MonsterData[]; dimensionId: string }) {
   const dim = DIMENSIONS[dimensionId] || DIMENSIONS.baroque
   const groupRef = useRef<THREE.Group>(null!)
+  const modelCacheRef = useRef<Map<number, THREE.Group>>(new Map())
+  
   const slimeGltf = useGLTF('/models/slime.glb')
   const forestGltf = useGLTF('/models/forest_monster.glb')
   const bossGltf = useGLTF('/models/boss.glb')
@@ -633,7 +634,7 @@ function MonsterRenderer({ monsters, dimensionId }: { monsters: MonsterData[]; d
   const forestTexture = useSafeTexture('/textures/forest_monster.png')
   const bossTexture = useSafeTexture('/textures/boss.png')
 
-  // Build one prototype per type, apply texture once
+  // Build prototypes once
   const slimeProto = useMemo(() => {
     if (!slimeScene) return null
     const c = slimeScene.clone(true)
@@ -653,51 +654,67 @@ function MonsterRenderer({ monsters, dimensionId }: { monsters: MonsterData[]; d
     return c
   }, [bossScene, bossTexture])
 
-  // Clone per instance so each monster gets its own Object3D
-  const aliveMonsters = useMemo(() => monsters.filter(m => m.alive), [monsters])
-  const monsterModels = useMemo(() => {
-    return aliveMonsters.map(m => {
-      const proto = m.type === MONSTER_SLIME ? slimeProto : m.type === MONSTER_FOREST ? forestProto : bossProto
-      if (!proto) return null
-      return proto.clone(true)
+  // Manage model instances via ref - avoids re-cloning on count changes
+  useEffect(() => {
+    if (!groupRef.current) return
+    const cache = modelCacheRef.current
+    const aliveIds = new Set<number>()
+    
+    monsters.forEach(m => {
+      if (!m.alive) return
+      aliveIds.add(m.id)
+      if (!cache.has(m.id)) {
+        const proto = m.type === MONSTER_SLIME ? slimeProto : m.type === MONSTER_FOREST ? forestProto : bossProto
+        if (proto) {
+          const clone = proto.clone(true)
+          cache.set(m.id, clone)
+          groupRef.current.add(clone)
+        }
+      }
     })
-  }, [aliveMonsters.length, slimeProto, forestProto, bossProto])
+    
+    // Remove dead monsters
+    for (const [id, obj] of cache) {
+      if (!aliveIds.has(id)) {
+        groupRef.current.remove(obj)
+        cache.delete(id)
+      }
+    }
+  }, [monsters, slimeProto, forestProto, bossProto])
 
-  // Update positions each frame without re-rendering
   useFrame(() => {
     if (!groupRef.current) return
-    const children = groupRef.current.children
-    for (let i = 0; i < children.length; i++) {
-      const m = aliveMonsters[i]
-      if (!m) continue
-      children[i].position.set(m.x, 0.5 + Math.sin(Date.now() * 0.003 + m.id) * 0.1, m.z)
+    const cache = modelCacheRef.current
+    for (const m of monsters) {
+      if (!m.alive) continue
+      const obj = cache.get(m.id)
+      if (obj) {
+        obj.position.set(m.x, 0.5 + Math.sin(Date.now() * 0.003 + m.id) * 0.1, m.z)
+        const scale = m.type === MONSTER_BOSS ? 2.0 : m.type === MONSTER_FOREST ? 1.4 : 1.0
+        obj.scale.setScalar(scale)
+      }
     }
   })
 
+  // Render HP bars as overlay (lightweight DOM-style via sprites)
+  const aliveMonsters = useMemo(() => monsters.filter(m => m.alive), [monsters])
+  
   return (
-    <group ref={groupRef}>
-      {aliveMonsters.map((m, i) => {
-        const model = monsterModels[i]
-        const scale = m.type === MONSTER_BOSS ? 2.0 : m.type === MONSTER_FOREST ? 1.4 : 1.0
+    <>
+      <group ref={groupRef} />
+      {aliveMonsters.map(m => {
+        if (m.hp >= m.maxHp) return null
         const mType = dim.monsterTypes[m.type]
-        const fallbackColor = mType?.color || '#66bb6a'
         return (
-          <group key={m.id} position={[m.x, 0.5, m.z]} scale={[scale, scale, scale]}>
-            {model ? <primitive object={model} /> : (
-              <mesh><sphereGeometry args={[0.5, 12, 12]} /><meshStandardMaterial color={fallbackColor} /></mesh>
-            )}
-            {m.hp < m.maxHp && (
-              <group position={[0, 0.9, 0]}>
-                <mesh><boxGeometry args={[1, 0.08, 0.02]} /><meshBasicMaterial color="#333" /></mesh>
-                <mesh position={[-(1 - m.hp / m.maxHp) * 0.5, 0, 0.01]}>
-                  <boxGeometry args={[m.hp / m.maxHp, 0.06, 0.02]} /><meshBasicMaterial color="#e53935" />
-                </mesh>
-              </group>
-            )}
+          <group key={'hp_' + m.id} position={[m.x, 1.2, m.z]}>
+            <mesh><boxGeometry args={[1, 0.06, 0.02]} /><meshBasicMaterial color="#333" /></mesh>
+            <mesh position={[-(1 - m.hp / m.maxHp) * 0.5, 0, 0.01]}>
+              <boxGeometry args={[m.hp / m.maxHp, 0.04, 0.02]} /><meshBasicMaterial color="#e53935" />
+            </mesh>
           </group>
         )
       })}
-    </group>
+    </>
   )
 }
 
@@ -1033,7 +1050,6 @@ function FloatingDamageItem({ damage }: { damage: { id: string; x: number; y: nu
     const progress = (Date.now() - startTime.current) / 1200
     if (progress >= 1) { ref.current.visible = false; return }
     ref.current.position.y = damage.y + progress * 2; matRef.current.opacity = Math.max(0, 1 - progress)
-    const sc = 1 + progress * 0.3; ref.current.scale.set(sc * 0.5, sc * 0.25, 1)
   })
   return (
     <mesh ref={ref} position={[damage.x, damage.y, damage.z]} renderOrder={1000}>
@@ -1055,7 +1071,16 @@ function TransitionOverlay() {
   )
 }
 
-const CRITICAL_TEXTURES = ['/textures/wall.png', '/textures/destructible.png', '/textures/ground.png']
+const CRITICAL_TEXTURES = [
+  '/textures/wall.png', '/textures/destructible.png', '/textures/ground.png',
+  '/textures/era_baroque_ground.png', '/textures/era_baroque_wall.png', '/textures/era_baroque_dest.png',
+  '/textures/era_classical_ground.png', '/textures/era_classical_wall.png', '/textures/era_classical_dest.png',
+  '/textures/era_romantic_ground.png', '/textures/era_romantic_wall.png', '/textures/era_romantic_dest.png',
+  '/textures/era_modern_ground.png', '/textures/era_modern_wall.png', '/textures/era_modern_dest.png',
+  '/textures/slime.png', '/textures/forest_monster.png', '/textures/boss.png',
+  '/textures/bomb.png', '/textures/player.png',
+  '/textures/hero_bach.png', '/textures/hero_mozart.png',
+]
 
 function AssetPreloader({ onReady }: { onReady: () => void }) {
   const [loaded, setLoaded] = useState(false)
@@ -1131,7 +1156,7 @@ function SceneContent() {
   const frameCount = useRef(0)
   useFrame(() => {
     frameCount.current++
-    if (frameCount.current % 10 === 0) {
+    if (frameCount.current % 30 === 0) {
       setMonsterState([...monstersRef.current])
       const monsters = monstersRef.current.map(m => ({ x: m.x, z: m.z, type: m.type, alive: m.alive }))
       useGameStore.getState().setMinimapData(map, monsters, useGameStore.getState().playerWorldPos, portalsData)
@@ -1243,7 +1268,7 @@ function SceneContent() {
   return (
     <>
       <ambientLight intensity={dim.ambientIntensity} />
-      <directionalLight position={[50, 80, 30]} intensity={1.0} castShadow shadow-mapSize-width={1024} shadow-mapSize-height={1024} shadow-camera-far={120} shadow-camera-left={-50} shadow-camera-right={50} shadow-camera-top={50} shadow-camera-bottom={-50} />
+      <directionalLight position={[50, 80, 30]} intensity={1.0} castShadow shadow-mapSize-width={512} shadow-mapSize-height={512} shadow-camera-far={120} shadow-camera-left={-50} shadow-camera-right={50} shadow-camera-top={50} shadow-camera-bottom={-50} />
       <fog attach="fog" args={[dim.fogColor, dim.fogNear, dim.fogFar]} />
       <Physics gravity={[0, 0, 0]} timeStep={1/60}>
         <Ground dimensionId={currentDimension} /><WallColliders map={map} /><BombColliders bombs={bombs} />
@@ -1271,7 +1296,7 @@ export function GameScene() {
   return (
     <Canvas camera={{ position: [0, 20, 15], fov: 50, near: 0.5, far: 200 }}
       gl={{ antialias: false, alpha: false, powerPreference: 'high-performance', stencil: false, depth: true, failIfMajorPerformanceCaveat: false }}
-      dpr={[1, 1.25]} frameloop="always" performance={{ min: 0.5 }}
+      dpr={[0.75, 1]} frameloop="always" performance={{ min: 0.5 }}
       style={{ position: 'absolute', inset: 0 }}
       onCreated={({ gl }) => {
         gl.setClearColor('#1a1a2e')
